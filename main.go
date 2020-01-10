@@ -31,6 +31,7 @@ func main() {
 	}
 
 	var cursor int
+	var progress int
 	var reply interface{}
 
 	for {
@@ -40,16 +41,18 @@ func main() {
 		}
 
 		for _, k := range reply.([]interface{})[1].([]interface{}) {
+			progress++
+
 			key, err := redis.String(k, nil)
 			if err != nil {
 				panic(err.Error())
 			}
-			val, err := redis.String(source.Do("GET", key))
+			val, err := source.Do("GET", key)
 			if err != nil {
 				panic(err.Error())
 			}
 
-			fmt.Printf("processing '%s' '%s'\n", key, val)
+			fmt.Printf("processing '%s', progress %d\n", key, progress)
 
 			_, err = dest.Do("SET", key, val)
 			if err != nil {
